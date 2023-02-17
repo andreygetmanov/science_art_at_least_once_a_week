@@ -39,7 +39,12 @@ def update_posted(path: str, key: str):
         f.close()
 
 
-async def main():
+def remove_markdown(text: str) -> str:
+    # removes all markdown symbols from text
+    return text.replace('*', '').replace('_', '')
+
+
+async def run_bot():
     """
     If the description is too long, it will be cut. Not more than 5 photos will be posted in the next message.
     If the description is too long for caption, <= 5 photos will be posted in the next message.
@@ -72,11 +77,20 @@ async def main():
                 print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown'))
 
 
+async def main():
+    try:
+        await run_bot()
+    except Exception:
+        data[key]['description_ru'] = remove_markdown(data[key]['description_ru'])
+        await run_bot()
+
+
 if __name__ == '__main__':
-    data = json.load(open('IA_AI_prizewinners_ru.json', 'r', encoding='utf-8'))
-    path = 'not_posted.txt'
+    data = json.load(open('/home/andrey_getmanov2802/science_art_at_least_once_a_week/IA_AI_prizewinners_ru.json', 'r', encoding='utf-8'))
+    path = '/home/andrey_getmanov2802/science_art_at_least_once_a_week/not_posted.txt'
     not_posted = open(path, 'r').readline().split(',')
     key = random.choice(not_posted)
+    print(f'Key is {key}')
     artwork = data[key]
     asyncio.run(main())
     update_posted(path, key)
