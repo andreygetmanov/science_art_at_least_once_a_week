@@ -3,7 +3,7 @@ import telegram
 import json
 import random
 
-token = 'TOKEN'
+token = '5636340713:AAGina24wxS-IPckYpUEAakF1hrVjrZwwH4'
 channel_id = '@science_art_at_least_once_a_week'
 MAX_POST_LENGTH = 4096
 MAX_CAPTION_LENGTH = 1024
@@ -39,7 +39,12 @@ def update_posted(path: str, key: str):
         f.close()
 
 
-async def main():
+def remove_markdown(text: str) -> str:
+    # removes all markdown symbols from text
+    return text.replace('*', '').replace('_', '')
+
+
+async def run_bot(parse_mode=None):
     """
     If the description is too long, it will be cut. Not more than 5 photos will be posted in the next message.
     If the description is too long for caption, <= 5 photos will be posted in the next message.
@@ -51,26 +56,33 @@ async def main():
         if len(message) >= MAX_POST_LENGTH:
             len_wo_desc = len(message) - len(artwork['description_ru'])
             message = get_message_text(artwork, len_wo_desc, to_cut=True)
-            print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown'))
+            print(await bot.send_message(chat_id=channel_id, text=message, parse_mode=parse_mode))
             images = [telegram.InputMediaPhoto(photo) for photo in artwork['img_list'][:5]]
             if len(images) > 0:
                 caption = get_caption_text(artwork)
                 print(await bot.send_media_group(chat_id=channel_id, media=images, caption=caption,
-                                                 parse_mode='markdown', read_timeout=60))
+                                                 parse_mode=parse_mode, read_timeout=60))
         elif MAX_CAPTION_LENGTH <= len(message) < MAX_POST_LENGTH:
-            print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown'))
+            print(await bot.send_message(chat_id=channel_id, text=message, parse_mode=parse_mode))
             images = [telegram.InputMediaPhoto(photo) for photo in artwork['img_list'][:5]]
             if len(images) > 0:
                 caption = get_caption_text(artwork)
                 print(await bot.send_media_group(chat_id=channel_id, media=images, caption=caption,
-                                                 parse_mode='markdown', read_timeout=60))
+                                                 parse_mode=parse_mode, read_timeout=60))
         elif len(message) < MAX_CAPTION_LENGTH:
             if len(artwork['img_list']) > 0:
                 print(await bot.send_photo(chat_id=channel_id, photo=artwork['img_list'][0],
-                                           caption=message, parse_mode='markdown', read_timeout=60))
+                                           caption=message, parse_mode=parse_mode, read_timeout=60))
             else:
-                print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown'))
+                print(await bot.send_message(chat_id=channel_id, text=message, parse_mode=parse_mode))
 
+
+async def main():
+    try:
+        await run_bot(parse_mode='markdown')
+    except Exception:
+        data[key]['description_ru'] = remove_markdown(data[key]['description_ru'])
+        await run_bot(parse_mode='markdown')
 
 if __name__ == '__main__':
     data = json.load(open('IA_AI_prizewinners_ru.json', 'r', encoding='utf-8'))
