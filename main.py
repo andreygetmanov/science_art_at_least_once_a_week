@@ -86,7 +86,7 @@ async def main():
 
 
 if __name__ == '__main__':
-    data = json.load(open('/home/andrey_getmanov2802/science_art_at_least_once_a_week/IA_AI_prizewinners_ru.json', 'r', encoding='utf-8'))
+    data = json.load(open('/home/andrey_getmanov2802/science_art_at_least_once_a_week/ars_electronica_prizewinners_ru.json', 'r', encoding='utf-8'))
     path = '/home/andrey_getmanov2802/science_art_at_least_once_a_week/not_posted.txt'
     not_posted = open(path, 'r').readline().split(',')
     key = random.choice(not_posted)
