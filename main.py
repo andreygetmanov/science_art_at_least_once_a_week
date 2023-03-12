@@ -41,7 +41,7 @@ def cut(text: str, length: int):
 
 def to_hashtag(text: str) -> str:
     return '#' + text.lower().replace('-', '').replace('–', '')\
-        .replace('(', '').replace(')', '').replace('/', ' ')\
+        .replace('(', '').replace(')', '').replace('/', ' ').replace('&', '')\
         .replace('   ', ' ').replace('  ', ' ').replace(' ', '\_')
 
 
@@ -119,7 +119,7 @@ async def run_bot():
                                            caption=message, parse_mode='markdown', read_timeout=60))
             else:
                 print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown'))
-        print(await bot.send_message(chat_id=channel_id, text=review_ru))
+        print(await bot.send_message(chat_id=channel_id, text=review_ru, parse_mode='markdown'))
 
 
 async def main():
@@ -143,6 +143,6 @@ if __name__ == '__main__':
              f'context in which the artwork was created and how it has been received by audiences over time.' \
              f'\nDescription:\n{delete_apostrophe(artwork["description"])}'
     review = generate_review(prompt)
-    review_ru = translate_text('ru', review)
+    review_ru = remove_markdown(translate_text('ru', review)) + '\n\n_Рецензия ChatGPT_'
     asyncio.run(main())
     update_posted(path, key)
