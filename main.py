@@ -100,14 +100,14 @@ async def run_bot():
         if len(message) >= MAX_POST_LENGTH:
             len_wo_desc = len(message) - len(artwork['description_ru'])
             message = get_message_text(artwork, len_wo_desc, to_cut=True)
-            print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown'))
+            print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown', read_timeout=60))
             images = [telegram.InputMediaPhoto(photo) for photo in artwork['img_list'][:5]]
             if len(images) > 0:
                 caption = get_caption_text(artwork)
                 print(await bot.send_media_group(chat_id=channel_id, media=images, caption=caption,
                                                  parse_mode='markdown', read_timeout=60))
         elif MAX_CAPTION_LENGTH <= len(message) < MAX_POST_LENGTH:
-            print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown'))
+            print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown', read_timeout=60))
             images = [telegram.InputMediaPhoto(photo) for photo in artwork['img_list'][:5]]
             if len(images) > 0:
                 caption = get_caption_text(artwork)
@@ -118,8 +118,8 @@ async def run_bot():
                 print(await bot.send_photo(chat_id=channel_id, photo=artwork['img_list'][0],
                                            caption=message, parse_mode='markdown', read_timeout=60))
             else:
-                print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown'))
-        print(await bot.send_message(chat_id=channel_id, text=review_ru, parse_mode='markdown'))
+                print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown', read_timeout=60))
+        print(await bot.send_message(chat_id=channel_id, text=review_ru, parse_mode='markdown', read_timeout=60))
 
 
 async def main():
