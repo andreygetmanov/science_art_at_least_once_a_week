@@ -119,7 +119,8 @@ async def run_bot():
                                            caption=message, parse_mode='markdown', read_timeout=60))
             else:
                 print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown', read_timeout=60))
-        print(await bot.send_message(chat_id=channel_id, text=review_ru, parse_mode='markdown', read_timeout=60))
+        if artwork['category'] != 'Visionary Pioneers of Media Art':
+            print(await bot.send_message(chat_id=channel_id, text=review_ru, parse_mode='markdown', read_timeout=60))
 
 
 async def main():
