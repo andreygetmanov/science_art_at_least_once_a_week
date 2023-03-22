@@ -139,10 +139,15 @@ if __name__ == '__main__':
     key = random.choice(not_posted)
     print(f'Key is {key}')
     artwork = data[key]
-    prompt = f'Please write a critical review of the artwork "{artwork["name"]}" by {artwork["authors"]} ' \
-             f'based on its description. Your review should not simply retell the description, but should offer ' \
-             f'a thoughtful and engaging analysis of the artwork. Additionally, please provide insights into the ' \
-             f'context in which the artwork was created and how it has been received by audiences over time.' \
+    prompt = f'Please write a critical review of the artwork "{artwork["name"]}" by ' \
+             f'contemporary artist {artwork["authors"]}. Your review should not simply retell the description, ' \
+             f'but should offer a thoughtful and engaging analysis of the artwork. ' \
+             f'Discuss its visual and technical elements, such as technique and medium, ' \
+             f'as well as its subject matter and any symbolism present. Explain the intentions ' \
+             f'of the artist and how they relate to the broader themes or movements in the art world.' \
+             f'Share your personal interpretation of the artwork and its emotional impact on viewers, ' \
+             f'and consider its significance within the body of work of the artist and the contemporary art scene. ' \
+             f'Compare the artwork with 1 or 2 other contemporary artists and their artworks.' \
              f'\nDescription:\n{delete_apostrophe(artwork["description"])}'
     review = generate_review(prompt)
     review_ru = remove_markdown(translate_text('ru', review)) + '\n\n_Рецензия ChatGPT_'
