@@ -150,6 +150,6 @@ if __name__ == '__main__':
              f'Compare the artwork with 1 or 2 other contemporary artists and their artworks.' \
              f'\nDescription:\n{delete_apostrophe(artwork["description"])}'
     review = generate_review(prompt)
-    review_ru = remove_markdown(translate_text('ru', review)) + '\n\n_Рецензия ChatGPT_'
+    review_ru = remove_markdown(translate_text('ru', review)) + '\n\n_Рецензия GPT-4_'
     asyncio.run(main())
     update_posted(path, key)
