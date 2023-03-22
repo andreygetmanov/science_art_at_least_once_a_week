@@ -74,7 +74,8 @@ def translate_text(target, text):
 def generate_review(prompt: str) -> str:
     completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        timeout=120
     )
     return completion['choices'][0]['message']['content']
 
