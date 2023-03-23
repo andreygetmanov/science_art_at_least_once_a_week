@@ -17,7 +17,7 @@ _Ссылка на канал: https://t.me/science_art_at_least_once_a_week_
 **Как это работает?**
 
 Если вкратце, то я:
-1. Собрал данные о работах с [сайта](https://archive.aec.at/prix/) архива Ars Electronica при помощи [парсера](https://github.com/andreygetmanov/ars_electronica_parser) (категории — Интерактивное искусство и AI-искусство)
+1. Собрал данные о работах с [сайта](https://archive.aec.at/prix/) архива Ars Electronica при помощи [парсера](https://github.com/andreygetmanov/ars_electronica_parser)
 2. Перевёл описания работ при помощи [Google Translate API](https://cloud.google.com/translate)
 3. Написал скрипт для постинга через [Телеграм-бота](https://core.telegram.org/bots/api):
 
