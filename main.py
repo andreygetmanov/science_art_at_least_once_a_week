@@ -139,15 +139,18 @@ if __name__ == '__main__':
     key = random.choice(not_posted)
     print(f'Key is {key}')
     artwork = data[key]
-    prompt = f'Please write a critical review of the artwork "{artwork["name"]}" by ' \
-             f'contemporary artist {artwork["authors"]}. Your review should not simply retell the description, ' \
-             f'but should offer a thoughtful and engaging analysis of the artwork. ' \
-             f'Discuss its visual and technical elements, such as technique and medium, ' \
-             f'as well as its subject matter and any symbolism present. Explain the intentions ' \
-             f'of the artist and how they relate to the broader themes or movements in the art world.' \
-             f'Share your personal interpretation of the artwork and its emotional impact on viewers, ' \
-             f'and consider its significance within the body of work of the artist and the contemporary art scene. ' \
-             f'Compare the artwork with 1 or 2 other contemporary artists and their artworks.' \
+    prompt = f'Compose an art review that emulates the distinctive style of ' \
+             f'a contemporary professional art critic who is an expert in art history,' \
+             f' contemporary and science art, and modern technologies such as AI and programming.' \
+             f' The review should provide a profound analysis of the visual and technical elements ' \
+             f'of the artwork, including the technique and medium employed, the subject matter, ' \
+             f'and any underlying symbolism. Discuss the possible intentions of the artist and ' \
+             f'how they relate to broader themes or movements within the art world. Offer a personal ' \
+             f'interpretation of the artwork, delving into its emotional impact on viewers, and consider ' \
+             f'its significance within the oeuvre of artist and the contemporary art scene. Additionally, ' \
+             f'draw comparisons between the piece in question and the works of 1 or 2 other contemporary artists, ' \
+             f'highlighting any similarities or contrasts in terms of artistic approach, themes, or techniques. ' \
+             f'Here is a description of the artwork "{artwork["name"]}" by {artwork["authors"]}: ' \
              f'\nDescription:\n{delete_apostrophe(artwork["description"])}'
     review = generate_review(prompt)
     review_ru = remove_markdown(translate_text('ru', review)) + '\n\n_Рецензия GPT-4_'
