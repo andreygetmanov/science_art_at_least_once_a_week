@@ -67,7 +67,7 @@ def translate_text(target, text):
     if isinstance(text, six.binary_type):
         text = text.decode("utf-8")
 
-    result = translate_client.translate(text, target_language=target)
+    result = translate_client.translate(text, target_language=target, format_='text')
     return result["translatedText"]
 
 
@@ -150,7 +150,8 @@ if __name__ == '__main__':
              f'its significance within the oeuvre of artist and the contemporary art scene. Additionally, ' \
              f'draw comparisons between the piece in question and the works of 1 or 2 other contemporary artists, ' \
              f'highlighting any similarities or contrasts in terms of artistic approach, themes, or techniques. ' \
-             f'Here is a description of the artwork "{artwork["name"]}" by {artwork["authors"]}: ' \
+             f'Here is a description of the artwork "{artwork["name"]}" by {artwork["authors"]} ' \
+             f'created in {artwork["year"]} year: ' \
              f'\nDescription:\n{delete_apostrophe(artwork["description"])}'
     review = generate_review(prompt)
     review_ru = remove_markdown(translate_text('ru', review)) + '\n\n_Рецензия GPT-4_'
