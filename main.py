@@ -3,9 +3,6 @@ import telegram
 import json
 import random
 import openai
-import six
-from google.oauth2 import service_account
-from google.cloud import translate_v2 as translate
 
 
 tg_token = 'TOKEN'
@@ -13,10 +10,6 @@ openai.api_key = 'TOKEN'
 channel_id = '@science_art_at_least_once_a_week'
 MAX_POST_LENGTH = 4096
 MAX_CAPTION_LENGTH = 1024
-
-# BIG_ID = '23770'
-# MEDIUM_ID = '23874'
-# SMALL_ID = '12024'
 
 
 def get_message_text(artwork: dict, message_length: int = 0, to_cut=False):
@@ -52,23 +45,6 @@ def delete_apostrophe(text):
 def remove_markdown(text: str) -> str:
     # removes all markdown symbols from text
     return text.replace('*', '').replace('_', '')
-
-
-def translate_text(target, text):
-    """
-    Translates text into the target language.
-    """
-
-    service_account_info = json.load(open('google-translate-auth.json'))
-    credentials = service_account.Credentials.from_service_account_info(
-        service_account_info)
-    translate_client = translate.Client(credentials=credentials)
-
-    if isinstance(text, six.binary_type):
-        text = text.decode("utf-8")
-
-    result = translate_client.translate(text, target_language=target, format_='text')
-    return result["translatedText"]
 
 
 def generate_review(prompt: str) -> str:
@@ -139,21 +115,15 @@ if __name__ == '__main__':
     key = random.choice(not_posted)
     print(f'Key is {key}')
     artwork = data[key]
-    prompt = f'Compose an art review that emulates the distinctive style of ' \
-             f'a contemporary professional art critic who is an expert in art history,' \
-             f' contemporary and science art, and modern technologies such as AI and programming.' \
-             f' The review should provide a profound analysis of the visual and technical elements ' \
-             f'of the artwork, including the technique and medium employed, the subject matter, ' \
-             f'and any underlying symbolism. Discuss the possible intentions of the artist and ' \
-             f'how they relate to broader themes or movements within the art world. Offer a personal ' \
-             f'interpretation of the artwork, delving into its emotional impact on viewers, and consider ' \
-             f'its significance within the oeuvre of artist and the contemporary art scene. Additionally, ' \
-             f'draw comparisons between the piece in question and the works of 1 or 2 other contemporary artists, ' \
-             f'highlighting any similarities or contrasts in terms of artistic approach, themes, or techniques. ' \
-             f'Here is a description of the artwork "{artwork["name"]}" by {artwork["authors"]} ' \
-             f'created in {artwork["year"]} year: ' \
+    prompt = f'Here is a description of the artwork "{artwork["name"]}" by {artwork["authors"]} ' \
+             f'created in {artwork["year"]} year. Please, provide 3 examples ' \
+             f'of contemporary artworks and artists that are somehow similar with this artwork. ' \
+             f'Explain your decision. Do not divide description and reasoning parts, ' \
+             f'combine them into the one paragraph. Give your answer in Russian, ' \
+             f'but do not translate the names of artists and artworks.' \
+             f'Use Markdown to structure your answer. Make the names of artists and artworks bold.' \
              f'\nDescription:\n{delete_apostrophe(artwork["description"])}'
     review = generate_review(prompt)
-    review_ru = remove_markdown(translate_text('ru', review)) + '\n\n_Рецензия GPT-4_'
+    review_ru = review + '\n\n_Рецензия GPT-4_'
     asyncio.run(main())
     update_posted(path, key)
