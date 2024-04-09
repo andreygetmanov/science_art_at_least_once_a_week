@@ -1,8 +1,11 @@
 import os
 import torch
+import json
 
 from transformers import AutoTokenizer, AutoModelForQuestionAnswering
 from transformers import AutoTokenizer, pipeline
+
+from typing import List
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
@@ -75,7 +78,10 @@ def get_top_k(retriever, query, query_ind = "", k = 3):
     
 #Example usage
 
+# import random
+
 # source = 'science_art_at_least_once_a_week-master/ars_electronica_prizewinners_ru.json'
+# path = 'science_art_at_least_once_a_week-master/not_posted.txt'
 # docs_db = load_vector_db(source)
 # retriever = init_retriever(docs_db)
 
@@ -84,4 +90,11 @@ def get_top_k(retriever, query, query_ind = "", k = 3):
 # key = random.choice(not_posted)
 # print(f'Key is {key}')
 # artwork = data[key]
+
+# print("Source:\n")
+# print(artwork["description_ru"], "\n")
 # res = get_top_k(retriever, artwork['description_ru'], key, 3)
+
+# print("Recs:\n")
+# for example in res:
+#     print(example.page_content, "\n")
