@@ -1,14 +1,8 @@
-import os
-import torch
 import json
-
-from transformers import AutoTokenizer, AutoModelForQuestionAnswering
-from transformers import AutoTokenizer, pipeline
-
 from typing import List
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain_core.document_loaders import BaseLoader
 from langchain_core.documents import Document
@@ -38,10 +32,11 @@ class JSONDocumentLoader(BaseLoader):
                 metadata=metadata,
             )
             dataset.append(entry)
-            
+
         return dataset
 
-def load_vector_db(file_path, use_splitter = True, chunk_size=2000, chunk_overlap=150):
+
+def load_vector_db(file_path, use_splitter=True, chunk_size=2000, chunk_overlap=150):
     '''
     Loads vector database with given chunk size and overlap, splitting can be disabled
     '''
@@ -52,22 +47,24 @@ def load_vector_db(file_path, use_splitter = True, chunk_size=2000, chunk_overla
         docs = text_splitter.split_documents(docs)
     return docs
 
-def init_retriever(docs, modelPath = "cointegrated/rubert-tiny2"):
+
+def init_retriever(docs, modelPath="cointegrated/rubert-tiny2"):
     '''
     Inits and returns retriever object with given embedding model (RuBert-tiny2 by defult)
     '''
-    model_kwargs = {'device':'cuda'}
+    model_kwargs = {'device': 'cuda'}
     encode_kwargs = {'normalize_embeddings': False}
     embeddings = HuggingFaceEmbeddings(
-        model_name=modelPath, 
-        model_kwargs=model_kwargs, 
-        encode_kwargs=encode_kwargs 
+        model_name=modelPath,
+        model_kwargs=model_kwargs,
+        encode_kwargs=encode_kwargs
     )
     db = FAISS.from_documents(docs, embeddings)
     retriever = db.as_retriever()
     return retriever
 
-def get_top_k(retriever, query, query_ind = "", k = 3):
+
+def get_top_k(retriever, query, query_ind="", k=3):
     '''
     Returns up to top K relevant documents
     Query indices are remaining str, not ind
@@ -75,8 +72,8 @@ def get_top_k(retriever, query, query_ind = "", k = 3):
     docs = retriever.get_relevant_documents(query)
     docs = [doc for doc in docs if doc.metadata["key"] != query_ind][:k]
     return docs
-    
-#Example usage
+
+# Example usage
 
 # import random
 

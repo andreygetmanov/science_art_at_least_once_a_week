@@ -1,9 +1,9 @@
 import asyncio
-import telegram
 import json
 import random
-import openai
 
+import openai
+import telegram
 
 tg_token = 'TOKEN'
 openai.api_key = 'TOKEN'
