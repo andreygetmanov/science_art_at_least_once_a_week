@@ -1,6 +1,7 @@
 import json
 from typing import List
 
+import torch.cuda
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -51,7 +52,10 @@ class VectorDB:
             self.docs = text_splitter.split_documents(self.docs)
 
     def init_embeddings(self):
-        model_kwargs = {"device": "cuda"}
+        if torch.cuda.is_available():
+            model_kwargs = {"device": "cuda:0"}
+        else:
+            model_kwargs = {"device": "cpu"}
         encode_kwargs = {"normalize_embeddings": False}
         self.embeddings = HuggingFaceEmbeddings(
             model_name=self.model_path,
