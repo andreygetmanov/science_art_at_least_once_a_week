@@ -48,10 +48,11 @@ class ArtworkAnalyser:
 
     def analyze_artworks(self, main_artwork, related_artworks):
         prompt = self.create_prompt(main_artwork, related_artworks)
+        print('Prompt: ', prompt)
         images = [main_artwork.images[0]] + [
             artwork.images[0] for artwork in related_artworks
         ]
-        print(images)
+        print('Images: ', images)
         response = self.client.chat.completions.create(
             model="gpt-4-turbo",
             messages=[
@@ -86,7 +87,7 @@ class ArtworkAnalyser:
                     ],
                 }
             ],
-            max_tokens=1000,
+            max_tokens=2000,
         )
         return response.choices
 

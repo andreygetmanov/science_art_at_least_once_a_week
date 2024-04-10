@@ -76,5 +76,5 @@ class Retriever:
 
     def get_top_k(self, query, query_ind="", k=3):
         docs = self.retriever.get_relevant_documents(query)
-        docs = [doc for doc in docs if doc.metadata["key"] != query_ind][:k]
+        docs = [doc for doc in docs if doc.metadata["name"] != query_ind][:k]
         return docs
