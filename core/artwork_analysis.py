@@ -89,7 +89,7 @@ class ArtworkAnalyser:
             ],
             max_tokens=2000,
         )
-        return response.choices
+        return response['choices'][0]['message']['content']
 
     @staticmethod
     def create_prompt(main_artwork, related_artworks):
