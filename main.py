@@ -43,22 +43,9 @@ def to_hashtag(text: str) -> str:
         .replace('   ', ' ').replace('  ', ' ').replace(' ', '\_')
 
 
-def delete_apostrophe(text):
-    return text.replace("'", "")
-
-
 def remove_markdown(text: str) -> str:
     # removes all markdown symbols from text
     return text.replace('*', '').replace('_', '')
-
-
-def generate_review(prompt: str) -> str:
-    completion = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": prompt}],
-        timeout=120
-    )
-    return completion['choices'][0]['message']['content']
 
 
 def update_posted(path: str, key: str):
