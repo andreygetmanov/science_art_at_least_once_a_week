@@ -157,5 +157,12 @@ class HFArtworkAnalyser:
             f"year: **{related_artworks[0].year}**, description: {related_artworks[0].description}\n"
             f"**Related artwork 2**: name: **{related_artworks[1].name}**, authors: **{related_artworks[1].authors}**, "
             f"year: **{related_artworks[1].year}**, description: {related_artworks[1].description}"
+            f"Briefly explain all these artworks and similarities and differences between artworks. "
+            f"Your text must look human-like, not a rigorous review. "
+            f"Do not divide description and reasoning parts. "
+            f"Use Markdown to structure your answer. "
+            f"Make the names of artists and artworks bold."
+            f"Do not explicitly divide your review into parts, simulate a true human speech. Do not use any titles or subtitles. "
+            f"Do not explicitly refer to the artworks as Main or Related. Use their titles instead."
         )
         return prompt
