@@ -124,23 +124,25 @@ class HFArtworkAnalyser:
             torch_dtype=torch.float16,
             low_cpu_mem_usage=True,
             load_in_4bit=True,
-            use_flash_attention_2=True,
+            # use_flash_attention_2=True,
         )
-        self.model.to("cuda:0")  # Use GPU if available for faster processing
 
     def analyze_artworks(self, main_artwork, related_artworks):
         prompt = self.create_prompt(main_artwork, related_artworks)
 
         images_urls = [main_artwork.images[0]] + [artwork.images[0] for artwork in related_artworks]
-        images = [Image.open(requests.get(url, stream=True).raw) for url in images_urls]
+        images = []
+        for url in images_urls:
+            image = Image.open(requests.get(url, stream=True).raw)
+            # Resize the image to the required size for the model; you might need to adjust this size
+            image = image.resize((256, 256))
+            images.append(image)
 
         full_prompt = "[INST] " + "\n".join(["<image>"] * len(images)) + "\n" + prompt + " [/INST]"
         inputs = self.processor(full_prompt, images=images, return_tensors="pt").to("cuda:0")
 
         output = self.model.generate(**inputs, max_new_tokens=1000)
-        result = self.processor.decode(output[0], skip_special_tokens=True)
-
-        return result
+        return self.processor.decode(output[0], skip_special_tokens=True)
 
     @staticmethod
     def create_prompt(main_artwork, related_artworks):
