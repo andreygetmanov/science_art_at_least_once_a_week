@@ -2,13 +2,16 @@ import asyncio
 import json
 import random
 import os
-from dotenv import load_dotenv
 from core.artwork_analysis import Artwork, ArtworkRetriever, ArtworkAnalyser
 import openai
 import telegram
 
-tg_token = 'TOKEN'
-openai.api_key = 'TOKEN'
+from dotenv import load_dotenv
+
+load_dotenv()
+
+TELEGRAM_API_KEY = os.getenv('TG_TOKEN')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 channel_id = '@science_art_at_least_once_a_week'
 MAX_POST_LENGTH = 4096
 MAX_CAPTION_LENGTH = 1024
@@ -111,9 +114,6 @@ async def main():
 
 
 if __name__ == '__main__':
-    load_dotenv()
-    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-    TELEGRAM_API_KEY = os.getenv('TELEGRAM_API_KEY')
     source = 'ars_electronica_prizewinners_ru.json'
     data = json.load(open(source, 'r', encoding='utf-8'))
     path = 'not_posted.txt'

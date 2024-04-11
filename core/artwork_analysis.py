@@ -89,7 +89,7 @@ class ArtworkAnalyser:
             ],
             max_tokens=2000,
         )
-        return response['choices'][0]['message']['content']
+        return response.choices[0].message.content
 
     @staticmethod
     def create_prompt(main_artwork, related_artworks):
@@ -107,5 +107,7 @@ class ArtworkAnalyser:
             f"Do not divide description and reasoning parts. "
             f"Use Markdown to structure your answer. "
             f"Make the names of artists and artworks bold."
+            f"Do not explicitly divide your review into parts, simulate a true human speech. Do not use any titles or subtitles. "
+            f"Do not explicitly refer to the artworks as Main or Related. Use their titles instead."
         )
         return prompt
