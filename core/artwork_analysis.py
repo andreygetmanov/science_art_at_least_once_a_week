@@ -131,6 +131,7 @@ class HFArtworkAnalyser:
         prompt = self.create_prompt(main_artwork, related_artworks)
 
         images_urls = [main_artwork.images[0]] + [artwork.images[0] for artwork in related_artworks]
+        print('Images: ', images_urls)
         images = []
         for url in images_urls:
             image = Image.open(requests.get(url, stream=True).raw)
