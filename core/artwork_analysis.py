@@ -1,7 +1,10 @@
-import json
-import os
+import requests
+import torch
+from PIL import Image
 from dotenv import load_dotenv
 from openai import OpenAI
+from transformers import LlavaNextProcessor, LlavaNextForConditionalGeneration
+
 from core.document_retrieval import VectorDB, Retriever
 
 load_dotenv()
@@ -109,5 +112,47 @@ class ArtworkAnalyser:
             f"Make the names of artists and artworks bold."
             f"Do not explicitly divide your review into parts, simulate a true human speech. Do not use any titles or subtitles. "
             f"Do not explicitly refer to the artworks as Main or Related. Use their titles instead."
+        )
+        return prompt
+
+
+class HFArtworkAnalyser:
+    def __init__(self, model_name='llava-hf/llava-v1.6-mistral-7b-hf'):
+        self.processor = LlavaNextProcessor.from_pretrained(model_name)
+        self.model = LlavaNextForConditionalGeneration.from_pretrained(
+            model_name,
+            torch_dtype=torch.float16,
+            low_cpu_mem_usage=True,
+            load_in_4bit=True,
+            use_flash_attention_2=True,
+        )
+        self.model.to("cuda:0")  # Use GPU if available for faster processing
+
+    def analyze_artworks(self, main_artwork, related_artworks):
+        prompt = self.create_prompt(main_artwork, related_artworks)
+
+        images_urls = [main_artwork.images[0]] + [artwork.images[0] for artwork in related_artworks]
+        images = [Image.open(requests.get(url, stream=True).raw) for url in images_urls]
+
+        full_prompt = "[INST] " + "\n".join(["<image>"] * len(images)) + "\n" + prompt + " [/INST]"
+        inputs = self.processor(full_prompt, images=images, return_tensors="pt").to("cuda:0")
+
+        output = self.model.generate(**inputs, max_new_tokens=1000)
+        result = self.processor.decode(output[0], skip_special_tokens=True)
+
+        return result
+
+    @staticmethod
+    def create_prompt(main_artwork, related_artworks):
+        # Create a prompt based on the artwork descriptions
+        prompt = (
+            f"Below are the descriptions of three artworks, including one main artwork and two related artworks. "
+            f"Analyze and compare these artworks based on their descriptions and the accompanying images.\n\n"
+            f"**Main artwork**: name: **{main_artwork.name}**, authors: **{main_artwork.authors}**, "
+            f"year: **{main_artwork.year}**, description: {main_artwork.description}\n"
+            f"**Related artwork 1**: name: **{related_artworks[0].name}**, authors: **{related_artworks[0].authors}**, "
+            f"year: **{related_artworks[0].year}**, description: {related_artworks[0].description}\n"
+            f"**Related artwork 2**: name: **{related_artworks[1].name}**, authors: **{related_artworks[1].authors}**, "
+            f"year: **{related_artworks[1].year}**, description: {related_artworks[1].description}"
         )
         return prompt

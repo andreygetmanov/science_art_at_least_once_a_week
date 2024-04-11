@@ -1,12 +1,12 @@
 import asyncio
 import json
-import random
 import os
-from core.artwork_analysis import Artwork, ArtworkRetriever, ArtworkAnalyser
-import openai
-import telegram
+import random
 
+import telegram
 from dotenv import load_dotenv
+
+from core.artwork_analysis import Artwork, ArtworkRetriever, ArtworkAnalyser
 
 load_dotenv()
 
