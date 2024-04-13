@@ -1,12 +1,17 @@
 import asyncio
-import telegram
 import json
+import os
 import random
-import openai
 
+import telegram
+from dotenv import load_dotenv
 
-tg_token = 'TOKEN'
-openai.api_key = 'TOKEN'
+from core.artwork_analysis import Artwork, ArtworkRetriever, ArtworkAnalyser
+
+load_dotenv()
+
+TELEGRAM_API_KEY = os.getenv('TG_TOKEN')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 channel_id = '@science_art_at_least_once_a_week'
 MAX_POST_LENGTH = 4096
 MAX_CAPTION_LENGTH = 1024
@@ -38,22 +43,9 @@ def to_hashtag(text: str) -> str:
         .replace('   ', ' ').replace('  ', ' ').replace(' ', '\_')
 
 
-def delete_apostrophe(text):
-    return text.replace("'", "")
-
-
 def remove_markdown(text: str) -> str:
     # removes all markdown symbols from text
     return text.replace('*', '').replace('_', '')
-
-
-def generate_review(prompt: str) -> str:
-    completion = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": prompt}],
-        timeout=120
-    )
-    return completion['choices'][0]['message']['content']
 
 
 def update_posted(path: str, key: str):
@@ -71,32 +63,32 @@ async def run_bot():
     If the description is too long for caption, <= 5 photos will be posted in the next message.
     If the description is short, it will be posted with one photo as caption.
     """
-    bot = telegram.Bot(tg_token)
+    bot = telegram.Bot(TELEGRAM_API_KEY)
     async with bot:
-        message = get_message_text(artwork)
+        message = get_message_text(main_artwork_data)
         if len(message) >= MAX_POST_LENGTH:
-            len_wo_desc = len(message) - len(artwork['description_ru'])
-            message = get_message_text(artwork, len_wo_desc, to_cut=True)
+            len_wo_desc = len(message) - len(main_artwork_data['description_ru'])
+            message = get_message_text(main_artwork_data, len_wo_desc, to_cut=True)
             print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown', read_timeout=60))
-            images = [telegram.InputMediaPhoto(photo) for photo in artwork['img_list'][:5]]
+            images = [telegram.InputMediaPhoto(photo) for photo in main_artwork_data['img_list'][:5]]
             if len(images) > 0:
-                caption = get_caption_text(artwork)
+                caption = get_caption_text(main_artwork_data)
                 print(await bot.send_media_group(chat_id=channel_id, media=images, caption=caption,
                                                  parse_mode='markdown', read_timeout=60))
         elif MAX_CAPTION_LENGTH <= len(message) < MAX_POST_LENGTH:
             print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown', read_timeout=60))
-            images = [telegram.InputMediaPhoto(photo) for photo in artwork['img_list'][:5]]
+            images = [telegram.InputMediaPhoto(photo) for photo in main_artwork_data['img_list'][:5]]
             if len(images) > 0:
-                caption = get_caption_text(artwork)
+                caption = get_caption_text(main_artwork_data)
                 print(await bot.send_media_group(chat_id=channel_id, media=images, caption=caption,
                                                  parse_mode='markdown', read_timeout=60))
         elif len(message) < MAX_CAPTION_LENGTH:
-            if len(artwork['img_list']) > 0:
-                print(await bot.send_photo(chat_id=channel_id, photo=artwork['img_list'][0],
+            if len(main_artwork_data['img_list']) > 0:
+                print(await bot.send_photo(chat_id=channel_id, photo=main_artwork_data['img_list'][0],
                                            caption=message, parse_mode='markdown', read_timeout=60))
             else:
                 print(await bot.send_message(chat_id=channel_id, text=message, parse_mode='markdown', read_timeout=60))
-        if artwork['category'] != 'Visionary Pioneers of Media Art':
+        if main_artwork_data['category'] != 'Visionary Pioneers of Media Art':
             print(await bot.send_message(chat_id=channel_id, text=review_ru, parse_mode='markdown', read_timeout=60))
 
 
@@ -109,21 +101,19 @@ async def main():
 
 
 if __name__ == '__main__':
-    data = json.load(open('ars_electronica_prizewinners_ru.json', 'r', encoding='utf-8'))
+    source = 'ars_electronica_prizewinners_ru.json'
+    data = json.load(open(source, 'r', encoding='utf-8'))
     path = 'not_posted.txt'
     not_posted = open(path, 'r').readline().split(',')
     key = random.choice(not_posted)
     print(f'Key is {key}')
-    artwork = data[key]
-    prompt = f'Here is a description of the artwork "{artwork["name"]}" by {artwork["authors"]} ' \
-             f'created in {artwork["year"]} year. Please, provide 3 examples ' \
-             f'of contemporary artworks and artists that are somehow similar with this artwork. ' \
-             f'Explain your decision. Do not divide description and reasoning parts, ' \
-             f'combine them into the one paragraph. Give your answer in Russian, ' \
-             f'but do not translate the names of artists and artworks.' \
-             f'Use Markdown to structure your answer. Make the names of artists and artworks bold.' \
-             f'\nDescription:\n{delete_apostrophe(artwork["description"])}'
-    review = generate_review(prompt)
-    review_ru = review + '\n\n_Рецензия GPT-4_'
+    main_artwork_data = data[key]
+    main_artwork = Artwork(main_artwork_data)
+    artwork_retriever = ArtworkRetriever(source)
+    related_artworks = artwork_retriever.get_related_artworks(main_artwork)
+
+    analysis = ArtworkAnalyser(OPENAI_API_KEY)
+    analysis_result = analysis.analyze_artworks(main_artwork, related_artworks)
+    review_ru = analysis_result + '\n\n_Рецензия GPT-4_'
     asyncio.run(main())
     update_posted(path, key)
